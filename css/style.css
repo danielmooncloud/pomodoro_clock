@@ -2,17 +2,18 @@
 @import url("https://fonts.googleapis.com/css?family=Eczar|Roboto+Mono");
 
 body {
-  background-image: url('http://wall-papers.info/images/desktop-backgrounds-black-and-white/desktop-backgrounds-black-and-white-25.jpg');
+  background-image: url('../images/diamonds.jpg');
   background-size: cover; 
   color: white;
   font-family: alexa-std;
   margin: 0 auto;
   padding: 0;
   font-family: 'Pacifico';
+  height: 900px;
 }
 
 .header {
-  background-image: url('https://images.freecreatives.com/wp-content/uploads/2016/02/High-Res-Wood-Background-Wallpaper.jpg');
+  background-image: url('../images/hardwood.jpg');
   background-size: cover;
   height: 100px;
   width: 100%;
@@ -27,10 +28,11 @@ body {
   margin-top: 100px;
   display: flex;
   width: 100%;
-  border: 1px solid white;
+  height: 100%;
 }
 
 .box {
+  display: flex;
   flex: 1 0;
   border: 2px solid white;
 }
@@ -78,10 +80,11 @@ body {
 }
 
 .clock {
+  display: flex;
   width: 300px;
   height: 300px;
   border-radius: 50%;
-  padding-top: 90px;
+  justify-content: center;
   text-align: center;
   margin: 100px auto;
   border: 2px solid rgba(247,247,247,1);
@@ -97,15 +100,16 @@ body {
 .clock h1 {
   font-size: 80px;
   text-shadow: 2px 2px 2px #000000;
+  align-self: center;
 }
 
 #left {
-  background-image: url('https://www.colourbox.com/preview/2175298-a-high-resolution-vintage-wooden-background-or-texture-with-corrosion-effect.jpg');
+  background-image: url('../images/scratchy.jpg');
   background-size: cover;
 }
 
 #right {
-  background-image: url('http://new.graphicpanic.com/wp-content/uploads/2015/09/high-resolution-scrap-metal-background.jpg');
+  background-image: url('../images/concrete.jpg');
   background-size: cover;
 }
 
@@ -212,3 +216,10 @@ button:focus {
       border: 1px solid white;
     }
 }
+
+@media screen and (min-width: 550px) {
+  .timebox, .clock {
+    align-self: center;
+  }
+}
+
