@@ -1,0 +1,23 @@
+body {
+  @include image(diamonds);
+}
+
+#left {
+  @include image(scratchy);
+}
+
+#right {
+  @include image(concrete);
+}
+
+.header {
+  @include image(hardwood);
+}
+
+.box {
+  border: 2px solid $white;
+}
+
+.clock {
+  border-radius: 50%;
+}

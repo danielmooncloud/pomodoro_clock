@@ -1,0 +1,32 @@
+.timebox {
+	@include transition(background-color);
+	&:hover {
+		background-color: $red;
+	}
+}
+
+.session, .break {
+	@include transition(background-color);
+	&:hover {
+		background-color: $red;
+	}
+}
+
+.clock {
+	background-color: $shadow;
+	@include transition(background-color);
+	&:hover {
+		background-color: $deep-shadow;
+	}
+}
+
+button {
+	background-color: $transparent;
+	@include transition(background-color);
+	&:hover {
+		background-color: $deep-red;
+	}
+}
+
+
+
