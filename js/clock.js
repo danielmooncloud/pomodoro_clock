@@ -1,5 +1,6 @@
 (function() {
-  
+'use strict';
+
   var model = {
     timer: 0,
     breakTimer: 0,
