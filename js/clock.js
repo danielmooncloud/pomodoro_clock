@@ -48,8 +48,6 @@
         clearInterval(this.interval);
         this.paused = true;
       } else {
-        console.log(controller.minutes);
-        console.log(controller.breakTime);
         this.paused = false;
         var deadline = Date.parse(new Date()) + (this.minutes*60*1000) + (this.seconds * 1000); 
         this.interval = setInterval(function() {
