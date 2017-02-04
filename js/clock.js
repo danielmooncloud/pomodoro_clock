@@ -18,12 +18,8 @@
       model.init();
       view.init();    
     },
-    getTimer: function() {
-      return model.timer;
-    },
-    getBreakTimer: function() {
-      return model.breakTimer;
-    },
+    getTimer: ()=> model.timer,
+    getBreakTimer: ()=> model.breakTimer,
     getTimeRemaining: function(deadline) { 
       this.minutes = Math.floor((deadline - Date.parse(new Date()))/60000); 
       this.seconds = Math.floor(((deadline - Date.parse(new Date()))/1000) % 60);
@@ -35,7 +31,7 @@
       }
     },
     clock: function(timer) {
-      var deadline = Date.parse(new Date()) + (timer*60*1000);      
+      let deadline = Date.parse(new Date()) + (timer*60*1000);      
       this.interval = setInterval(function() {
         controller.getTimeRemaining(deadline);
         view.renderTime(controller.timeRemaining);
@@ -57,7 +53,7 @@
         }, 1000);        
       }
     },
-    reset: function() {
+    reset: ()=> {
       clearInterval(controller.interval);
       controller.paused = false;
       controller.breakTime = false;
@@ -76,23 +72,22 @@
         view.render(this.getTimer());
       }
     },
-    addBreakTime: function() {
+    addBreakTime: ()=> {
       model.breakTimer += 1;
       view.renderBreakset(controller.getBreakTimer());
     },
-    subBreakTime: function() {
+    subBreakTime: ()=> {
       if(model.breakTimer >= 1) {
         model.breakTimer -= 1;
         view.renderBreakset(controller.getBreakTimer());
       }
     },
-    stateChange: function() {
+    stateChange: ()=> {
       if(controller.minutes === 0 && controller.seconds === 0 && !controller.breakTime) {
         clearInterval(controller.interval);
         controller.clock(model.breakTimer);
         controller.breakTime = true;
       } else if(controller.minutes === 0 && controller.seconds === 0 && controller.breakTime) {
-        console.log('test');
         controller.reset();
       }
     }
@@ -107,13 +102,11 @@
     },
     render: function() {
       if(!this.inProgress) {
-        var timer = controller.getTimer();
+        let timer = controller.getTimer();
         view.$clock.html('<h1>' + timer + '</h1>');
       };
     },
-    renderTime: function(timer) {
-       view.$clock.html('<h1>' + timer + '</h1>');
-    },
+    renderTime: (timer)=> view.$clock.html('<h1>' + timer + '</h1>'),
     renderTimeSet: function(timer) {
       this.$timeset.html('<h3>' + timer + '</h3>');
     },
