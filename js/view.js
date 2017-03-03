@@ -21,35 +21,27 @@ view = {
 
 	bindEvents: function() {
 		this.$start.click(function() {
-			view.handleStart();
+			clock.tickTock();
 		})
 		this.$pause.click(function() {
-        	view.handlePause();
+        	clock.pause();
       	})
 		this.$reset.click(function() {
-        	view.handleReset();      
+        	clock.reset();      
       	})
 		this.$add.click(function() {
-			view.handle$Add();
+			clock.addOneMinute(1);
 		})
 		this.$sub.click(function() {
-			view.handle$Sub();
+			clock.addOneMinute(-1);
 		})
 		this.$addbreak.click(function() {
-        	view.handleAddBreak();
+        	clock.addBreakMinute(1);
      	});
       	this.$subbreak.click(function() {
-        	view.handleSubBreak();
+        	clock.addBreakMinute(-1);
       });
 	},
-
-	handleStart: ()=> clock.tickTock(),
-	handlePause: ()=> clock.pause(),
-	handleReset: ()=> clock.reset(),
-	handle$Add: ()=> clock.addOneMinute(),
-	handle$Sub: ()=> clock.subOneMinute(),
-	handleAddBreak: ()=> clock.addBreakMinute(),
-	handleSubBreak: ()=> clock.subBreakMinute(),
 
 	renderTime: (time)=> view.$clock.html('<h1>' + time + '</h1>'),
 	renderTimeSet: (length)=> view.$timeset.html('<h3>' + length + '</h3>'),

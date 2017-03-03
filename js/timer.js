@@ -4,10 +4,13 @@ function Timer(num) {
 	let length = num;
 	
 	this.getLength = ()=> length;
-	this.addMinute = ()=> length += 1;	
-	this.subMinute = ()=> {
-		if(length > 1) {
-			return length -= 1;
-		}	
+	
+	this.addMinute = (num)=> {
+		if(length === 1 && num < 0);
+		else return length += num;
 	}
+
 }
+
+
+	

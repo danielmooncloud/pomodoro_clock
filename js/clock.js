@@ -49,25 +49,14 @@ function Clock() {
       	paused = !paused;
     },
 
-    this.addOneMinute = function() {
-    	let length = timer.addMinute();
+    this.addOneMinute = function(num) {
+    	let length = timer.addMinute(num) || 1;
     	view.renderTimeSet(length);
     	if(!inProgress) view.renderTime(length)
     },
 
-    this.subOneMinute = function() {
-    	let length = timer.subMinute() || 1;
-    	view.renderTimeSet(length);
-    	if(!inProgress) view.renderTime(length)
-    },
-
-	this.addBreakMinute = function() {
-		let length = breakTimer.addMinute();
-		view.renderBreakSet(length);
-	},
-
-	this.subBreakMinute = function() {
-		let length = breakTimer.subMinute() || 1;
+	this.addBreakMinute = function(num) {
+		let length = breakTimer.addMinute(num) || 1;
 		view.renderBreakSet(length);
 	},
 
