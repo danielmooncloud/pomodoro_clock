@@ -43,7 +43,13 @@ view = {
       });
 	},
 
-	renderTime: (time)=> view.$clock.html('<h1>' + time + '</h1>'),
-	renderTimeSet: (length)=> view.$timeset.html('<h3>' + length + '</h3>'),
-	renderBreakSet: (length)=> view.$breakset.html('<h3>' + length + '</h3>')
+	renderTime: function(time) {
+		view.$clock.html('<h1>' + time + '</h1>')
+	},
+	renderTimeSet: function(length) {
+		view.$timeset.html('<h3>' + length + '</h3>')
+	},
+	renderBreakSet: function(length) {
+		view.$breakset.html('<h3>' + length + '</h3>')
+	} 
 }

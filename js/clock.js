@@ -1,72 +1,35 @@
 function Clock() {
 	'use strict';
 	
-	let timer = new Timer(25);
-	let breakTimer = new Timer(5);
-	let interval;
-	let self = this;
-	let inProgress = false;
-	let breakTime = false;
-	let paused = false;
-	let minutes;
-	let seconds;
+	var timer = new Timer(25);
+	var breakTimer = new Timer(5);
+	var interval;
+	var inProgress = false;
+	var breakTime = false;
+	var paused = false;
+	var minutes;
+	var seconds;
 
-	this.init = function() {
+	var init = function() {
 		view.init();
 		view.renderTime(timer.getLength())
 	}
 
-	this.getTimeRemaining = function(deadline) { 
+	var getTimeRemaining = function(deadline) { 
 		minutes = Math.floor((deadline - Date.parse(new Date()))/60000); 
 		seconds = Math.floor(((deadline - Date.parse(new Date()))/1000) % 60);
 		return seconds >= 10 ? minutes + ':' + seconds : minutes + ':0' + seconds
   	}
 
-  	this.clockInterval = function(deadline) {
+  	var clockInterval = function(deadline) {
   		interval = setInterval(function() {
-    		let timeRemaining = self.getTimeRemaining(deadline);
+    		var timeRemaining = getTimeRemaining(deadline);
     		view.renderTime(timeRemaining);  
-    		if(minutes + seconds === 0) self.switchToBreak();    
+    		if(minutes + seconds === 0) switchToBreak();    
       	}, 1000);
   	}
 
-  	this.tickTock = function() {
-  		let current = breakTime ? breakTimer : timer; 
-  		if(!inProgress) {
-  			inProgress = true;
-  			let deadline = Date.parse(new Date()) + (current.getLength()*60*1000); 
-  			this.clockInterval(deadline);     		
-  		}	
-    },
-
-    this.pause = function() {
-      	if(!paused) {	
-        	clearInterval(interval);
-      	} else {
-        	let deadline = Date.parse(new Date()) + (minutes*60*1000) + (seconds * 1000); 
-        	this.clockInterval(deadline);     
-      	}
-      	paused = !paused;
-    },
-
-    this.addOneMinute = function(num) {
-    	let length = timer.addMinute(num) || 1;
-    	view.renderTimeSet(length);
-    	if(!inProgress) view.renderTime(length)
-    },
-
-	this.addBreakMinute = function(num) {
-		let length = breakTimer.addMinute(num) || 1;
-		view.renderBreakSet(length);
-	},
-
-	this.reset = function() {
-		clearInterval(interval);
-      	paused = breakTime = inProgress = false;
-      	view.renderTime(timer.getLength());
-	},
-
-	this.switchToBreak = function() {
+  	var switchToBreak = function() {
 		inProgress = false;
 		if(!breakTime) {
 			clearInterval(interval);
@@ -77,7 +40,42 @@ function Clock() {
 		}
 	}	
 
-	this.init();
+  	this.tickTock = function() {
+  		var current = breakTime ? breakTimer : timer; 
+  		if(!inProgress) {
+  			inProgress = true;
+  			var deadline = Date.parse(new Date()) + (current.getLength()*60*1000); 
+  			clockInterval(deadline);     		
+  		}	
+    }
 
+    this.pause = function() {
+      	if(!paused) {	
+        	clearInterval(interval);
+      	} else {
+        	var deadline = Date.parse(new Date()) + (minutes*60*1000) + (seconds * 1000); 
+        	clockInterval(deadline);     
+      	}
+      	paused = !paused;
+    }
+
+    this.addOneMinute = function(num) {
+    	var length = timer.addMinute(num) || 1;
+    	view.renderTimeSet(length);
+    	if(!inProgress) view.renderTime(length)
+    }
+
+	this.addBreakMinute = function(num) {
+		var length = breakTimer.addMinute(num) || 1;
+		view.renderBreakSet(length);
+	}
+
+	this.reset = function() {
+		clearInterval(interval);
+      	paused = breakTime = inProgress = false;
+      	view.renderTime(timer.getLength());
+	}
+
+	init();
 }
 

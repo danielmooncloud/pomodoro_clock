@@ -1,7 +1,7 @@
 function Timer(num) {
 	'use strict';
 		
-	let length = num;
+	var length = num;
 	
 	this.getLength = ()=> length;
 	
