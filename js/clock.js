@@ -42,7 +42,7 @@ function Clock() {
     this.pause = function() {
       	if(!paused) {	
         	clearInterval(interval);
-      	} else if(paused) {
+      	} else {
         	let deadline = Date.parse(new Date()) + (minutes*60*1000) + (seconds * 1000); 
         	this.clockInterval(deadline);     
       	}
@@ -53,7 +53,6 @@ function Clock() {
     	let length = timer.addMinute();
     	view.renderTimeSet(length);
     	if(!inProgress) view.renderTime(length)
-
     },
 
     this.subOneMinute = function() {
@@ -74,9 +73,7 @@ function Clock() {
 
 	this.reset = function() {
 		clearInterval(interval);
-      	paused = false;
-      	breakTime = false;
-      	inProgress = false;
+      	paused = breakTime = inProgress = false;
       	view.renderTime(timer.getLength());
 	},
 
