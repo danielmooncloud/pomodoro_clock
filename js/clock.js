@@ -42,14 +42,13 @@ function Clock() {
     },
 
     this.pause = function() {
-      	if(!paused) {
-      		paused = true;
+      	if(!paused) {	
         	clearInterval(interval);
-      	} else {
-        	paused = false;
+      	} else if(paused) {
         	let deadline = Date.parse(new Date()) + (minutes*60*1000) + (seconds * 1000); 
         	this.clockInterval(deadline);     
       	}
+      	paused = !paused;
     },
 
     this.addOneMinute = function() {
