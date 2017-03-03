@@ -16,8 +16,6 @@ function Clock() {
 		view.renderTime(timer.getLength())
 	}
 
-	this.init();
-
 	this.getTimeRemaining = function(deadline) { 
 		minutes = Math.floor((deadline - Date.parse(new Date()))/60000); 
 		seconds = Math.floor(((deadline - Date.parse(new Date()))/1000) % 60);
@@ -92,5 +90,8 @@ function Clock() {
 			this.reset();
 		}
 	}	
+
+	this.init();
+
 }
 
