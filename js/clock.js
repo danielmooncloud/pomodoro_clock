@@ -95,10 +95,3 @@ function Clock() {
 	}	
 }
 
-(function() {
-	var clock = new Clock();
-	clock.init();
-}())
-
-
-
