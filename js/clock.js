@@ -1,160 +1,104 @@
+function Clock() {
+	'use strict';
+	
+	let timer = new Timer(25);
+	let breakTimer = new Timer(5);
+	let interval;
+	let self = this;
+	let inProgress = false;
+	let breakTime = false;
+	let paused = false;
+	let minutes;
+	let seconds;
+
+	this.init = function() {
+		view.init();
+		view.renderTime(timer.getLength())
+	}
+
+	this.init();
+
+	this.getTimeRemaining = function(deadline) { 
+		minutes = Math.floor((deadline - Date.parse(new Date()))/60000); 
+		seconds = Math.floor(((deadline - Date.parse(new Date()))/1000) % 60);
+		return seconds >= 10 ? minutes + ':' + seconds : minutes + ':0' + seconds
+  	}
+
+  	this.clockInterval = function(deadline) {
+  		interval = setInterval(function() {
+    		let timeRemaining = self.getTimeRemaining(deadline);
+    		view.renderTime(timeRemaining);  
+    		if(minutes + seconds === 0) self.switchToBreak();    
+      	}, 1000);
+  	}
+
+  	this.tickTock = function() {
+  		let current = breakTime ? breakTimer : timer; 
+  		if(!inProgress) {
+  			inProgress = true;
+  			let deadline = Date.parse(new Date()) + (current.getLength()*60*1000); 
+  			this.clockInterval(deadline);     		
+  		}	
+    },
+
+    this.pause = function() {
+      	if(!paused) {
+      		paused = true;
+        	clearInterval(interval);
+      	} else {
+        	paused = false;
+        	let deadline = Date.parse(new Date()) + (minutes*60*1000) + (seconds * 1000); 
+        	this.clockInterval(deadline);     
+      	}
+    },
+
+    this.addOneMinute = function() {
+    	let length = timer.addMinute();
+    	view.renderTimeSet(length);
+    	if(!inProgress) view.renderTime(length)
+
+    },
+
+    this.subOneMinute = function() {
+    	let length = timer.subMinute() || 1;
+    	view.renderTimeSet(length);
+    	if(!inProgress) view.renderTime(length)
+    },
+
+	this.addBreakMinute = function() {
+		let length = breakTimer.addMinute();
+		view.renderBreakSet(length);
+	},
+
+	this.subBreakMinute = function() {
+		let length = breakTimer.subMinute() || 1;
+		view.renderBreakSet(length);
+	},
+
+	this.reset = function() {
+		clearInterval(interval);
+      	paused = false;
+      	breakTime = false;
+      	inProgress = false;
+      	view.renderTime(timer.getLength());
+	},
+
+	this.switchToBreak = function() {
+		inProgress = false;
+		if(!breakTime) {
+			clearInterval(interval);
+			breakTime = true;
+			this.tickTock(breakTimer.getLength());	
+		} else {
+			this.reset();
+		}
+	}	
+}
+
 (function() {
-'use strict';
+	var clock = new Clock();
+	clock.init();
+}())
 
-  var model = {
-    timer: 0,
-    breakTimer: 0,
-    init: function() {
-      this.timer = 25;
-      this.breakTimer = 5;
-    }
-  };
-  
-  var controller = {
-    paused: false,
-    breakTime: false,
-    init: function() {
-      this.interval;
-      model.init();
-      view.init();    
-    },
-    getTimer: ()=> model.timer,
-    getBreakTimer: ()=> model.breakTimer,
-    getTimeRemaining: function(deadline) { 
-      this.minutes = Math.floor((deadline - Date.parse(new Date()))/60000); 
-      this.seconds = Math.floor(((deadline - Date.parse(new Date()))/1000) % 60);
-      if(this.seconds >= 10) {
-        this.timeRemaining = this.minutes + ':' + this.seconds;         
-      }
-      else {
-        this.timeRemaining = this.minutes + ':0' + this.seconds;
-      }
-    },
-    clock: function(timer) {
-      let deadline = Date.parse(new Date()) + (timer*60*1000);      
-      this.interval = setInterval(function() {
-        controller.getTimeRemaining(deadline);
-        view.renderTime(controller.timeRemaining);
-        controller.stateChange();
-      }, 1000);
-      this.inProgress = true;
-    },
-    pause: function() {
-      if(!this.paused) {
-        clearInterval(this.interval);
-        this.paused = true;
-      } else {
-        this.paused = false;
-        var deadline = Date.parse(new Date()) + (this.minutes*60*1000) + (this.seconds * 1000); 
-        this.interval = setInterval(function() {
-          controller.getTimeRemaining(deadline);
-          view.renderTime(controller.timeRemaining);
-          controller.stateChange();
-        }, 1000);        
-      }
-    },
-    reset: ()=> {
-      clearInterval(controller.interval);
-      controller.paused = false;
-      controller.breakTime = false;
-      view.inProgress = false;
-      view.render();
-    },
-    addTime: function() {     
-      model.timer += 1;
-      view.renderTimeSet(this.getTimer());
-      view.render(this.getTimer());    
-    },
-    subTime: function() {
-      if(model.timer >= 1) {
-        model.timer -= 1;
-        view.renderTimeSet(this.getTimer());
-        view.render(this.getTimer());
-      }
-    },
-    addBreakTime: ()=> {
-      model.breakTimer += 1;
-      view.renderBreakset(controller.getBreakTimer());
-    },
-    subBreakTime: ()=> {
-      if(model.breakTimer >= 1) {
-        model.breakTimer -= 1;
-        view.renderBreakset(controller.getBreakTimer());
-      }
-    },
-    stateChange: ()=> {
-      if(controller.minutes === 0 && controller.seconds === 0 && !controller.breakTime) {
-        clearInterval(controller.interval);
-        controller.clock(model.breakTimer);
-        controller.breakTime = true;
-      } else if(controller.minutes === 0 && controller.seconds === 0 && controller.breakTime) {
-        controller.reset();
-      }
-    }
-  };
-  
-  var view = {
-    init: function() {
-      this.inProgress = false;
-      this.cacheDom();
-      this.bind();
-      this.render();
-    },
-    render: function() {
-      if(!this.inProgress) {
-        let timer = controller.getTimer();
-        view.$clock.html('<h1>' + timer + '</h1>');
-      };
-    },
-    renderTime: (timer)=> view.$clock.html('<h1>' + timer + '</h1>'),
-    renderTimeSet: function(timer) {
-      this.$timeset.html('<h3>' + timer + '</h3>');
-    },
-    renderBreakset: function(timer) {
-      this.$breakset.html('<h3>' + timer + '</h3>');
-    },
-    cacheDom: function() {
-      this.$clock = $('.clock');
-      this.$start = $('.start');
-      this.$pause = $('.pause');
-      this.$reset = $('.reset');
-      this.$sub = $('.sub');
-      this.$add = $('.add');
-      this.$subbreak = $('.subbreak');
-      this.$addbreak = $('.addbreak');
-      this.$timeset = $('.timeset');
-      this.$breakset = $('.breakset');
-  },
-    bind: function() {
-      this.$start.click(function() {
-        if(!view.inProgress) {
-          controller.clock(controller.getTimer());
-          view.inProgress = true;
-        }
-      });
-      this.$pause.click(function() {
-        controller.pause();
-      });
-      this.$reset.click(function() {
-        controller.reset();      
-      });
-      this.$add.click(function() {
-        controller.addTime();
-      });      
-      this.$sub.click(function() {
-        controller.subTime();
-      });
-      this.$addbreak.click(function() {
-        controller.addBreakTime();
-      });
-      this.$subbreak.click(function() {
-        controller.subBreakTime();
-      });
-    } 
-  };
-  
-$(document).ready(function() {
-  controller.init();
-});
 
-})();
+
