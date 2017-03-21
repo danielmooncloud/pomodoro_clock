@@ -79,3 +79,5 @@ function Clock() {
 	init();
 }
 
+
+var clock = new Clock();
