@@ -83,3 +83,14 @@ body {
 .timeset, .breakset {
   @include flex(2, 0);
 }
+
+.header-button {
+  margin: 0;
+}
+
+h3 {
+  margin: 0;
+}
+
+
+
