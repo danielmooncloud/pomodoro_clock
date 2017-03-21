@@ -1,4 +1,4 @@
-function Timer(num) {
+module.exports = function Timer(num) {
 	'use strict';
 		
 	var length = num;
@@ -13,4 +13,3 @@ function Timer(num) {
 }
 
 
-	

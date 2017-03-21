@@ -1,4 +1,7 @@
-function Clock() {
+var Timer = require("./timer");
+
+
+module.exports = function Clock(view) {
 	'use strict';
 	
 	var timer = new Timer(25);
@@ -9,6 +12,7 @@ function Clock() {
 	var paused = false;
 	var minutes;
 	var seconds;
+
 
 	var init = function() {
 		view.init();
@@ -78,6 +82,3 @@ function Clock() {
 
 	init();
 }
-
-
-var clock = new Clock();

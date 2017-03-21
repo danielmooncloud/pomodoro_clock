@@ -1,4 +1,8 @@
-view = {
+require("../scss/application.scss");
+var Clock = require("./clock");
+
+
+const view = {
 	init: function() {
 		this.cacheDom();
 		this.bindEvents();
@@ -53,3 +57,6 @@ view = {
 		view.$breakset.html('<h3>' + length + '</h3>')
 	} 
 }
+
+
+var clock = new Clock(view);
