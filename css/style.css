@@ -1,0 +1,225 @@
+@import url('https://fonts.googleapis.com/css?family=Pacifico|Open+Sans:300');
+@import url("https://fonts.googleapis.com/css?family=Eczar|Roboto+Mono");
+
+body {
+  background-image: url('../images/diamonds.jpg');
+  background-size: cover; 
+  color: white;
+  font-family: alexa-std;
+  margin: 0 auto;
+  padding: 0;
+  font-family: 'Pacifico';
+  height: 900px;
+}
+
+.header {
+  background-image: url('../images/hardwood.jpg');
+  background-size: cover;
+  height: 100px;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  margin-top: 0;
+  padding-top: 30px;
+  text-align: left;
+}
+
+.lower {
+  margin-top: 100px;
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.box {
+  display: flex;
+  flex: 1 0;
+  border: 2px solid white;
+}
+
+.timebox {
+  width: 40%;
+  margin: 35% auto;
+  border: 3px solid white;
+  display: flex;
+  flex-direction: column;
+  transition: background-color 1s;
+}
+
+.timebox:hover {
+  background-color: rgba(79, 13, 4, 1);
+}
+
+#sessiontext {
+  flex: 1 0;
+  text-align: center;
+}
+
+.session, .break {
+  flex: 1 0;
+  display: flex;
+  transition: background-color 1s;
+}
+
+.session:hover, .break:hover {
+  background-color: rgba(79, 13, 4, 1);
+}
+
+.sub, .add, .subbreak, .addbreak {
+  flex: 1 0;
+  
+}
+
+.timeset {
+  flex: 2 0;
+  width: 100%;
+}
+#time {
+  flex: 1.5 0;
+  font-family: Brush Script MT; 
+}
+
+.clock {
+  display: flex;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  justify-content: center;
+  text-align: center;
+  margin: 100px auto;
+  border: 2px solid rgba(247,247,247,1);
+  background-color: rgba(1,1,1,.3);
+  transition: background-color 1s;
+}
+
+.clock:hover {
+  background-color: rgba(1,1,1,.7);
+}
+
+
+.clock h1 {
+  font-size: 80px;
+  text-shadow: 2px 2px 2px #000000;
+  align-self: center;
+}
+
+#left {
+  background-image: url('../images/scratchy.jpg');
+  background-size: cover;
+}
+
+#right {
+  background-image: url('../images/concrete.jpg');
+  background-size: cover;
+}
+
+.header button {
+  height: 50px;
+  width: 100px;
+  margin-right: 20px;
+  margin-left: 20px;
+  background-color: rgba(0,0,0,0);
+  font-family: 'Pacifico';
+  text-shadow: 1px 1px 1px rgb(1,1,1);
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: background-color 1s;
+}
+
+button {
+ background-color: rgba(0,0,0,0);
+ transition: background-color 1s;
+}
+
+button:hover {
+  background-color: rgba(56,15,10,1);
+}
+
+button:focus {
+  outline:none;
+}
+
+@media screen and (max-width: 880px) { 
+  .timebox {
+    width: 60%;
+  }
+}
+
+@media screen and (max-width: 650px) {
+  .timebox {
+    flex-direction: column;
+  }
+  
+  .session, .break {
+    flex: 3 0;
+    flex-direction: column;
+  }
+}
+  @media screen and (max-width: 550px) {
+    body {
+      display: flex;
+      flex-direction: column;
+    }
+    .header {
+      flex: 1 0;
+      display: flex;
+    }
+    
+    .header button {
+      flex: 1 0;
+      margin: 0;
+    }
+    
+    .lower {
+      flex: 1 0;
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 0;
+      padding-bottom: 0;
+      height: 450px;
+      border: none;
+    }
+    
+    .box, #time {
+      flex: 1 0;
+      display: flex;
+      flex-dirction: column; 
+      border-bottom: 1px solid white;
+    }
+    
+    .timebox {
+      flex: 1 0;
+      margin: 0 auto;
+      border: 0px;
+    }
+    
+    .clock {
+      flex: 1 0;
+      border-radius: 0;
+      padding: 0px;
+      margin: 0 auto;
+    }
+    
+    .session, .break {
+      flex-direction: row;
+    }
+    
+    .session button, .session span, .break button, .break span {
+      flex: 1 0;
+    }
+    
+    h3 {
+      font-size: 36px;
+    }
+    
+    .lower button {
+      border: 1px solid white;
+    }
+}
+
+@media screen and (min-width: 550px) {
+  .timebox, .clock {
+    align-self: center;
+  }
+}
+
