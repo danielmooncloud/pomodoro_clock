@@ -2,8 +2,8 @@ import Timer from "./timer";
 
 
 export default class Clock {
-	constructor(view) {
-		this.view = view;
+	constructor() {
+		this._view;
 		this.timer = new Timer(25);
 		this.breakTimer = new Timer(5);
 		this.interval;
@@ -14,8 +14,17 @@ export default class Clock {
 		this.seconds;
 	}
 
+	get view() {
+		return this._view;
+	}
 
-	init() {
+	set view(view) {
+		this._view = view;
+	}
+
+
+	init(view) {
+		this._view = view;
 		this.view.init();
 		this.view.renderTime(this.timer.getLength());
 	}

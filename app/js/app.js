@@ -62,8 +62,8 @@ $(document).ready(function() {
 		} 
 	};
 
-	const clock = new Clock(view);
-	clock.init();
+	const clock = new Clock();
+	clock.init(view);
 
 });
 
