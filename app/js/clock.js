@@ -1,84 +1,86 @@
-var Timer = require("./timer");
+import Timer from "./timer";
 
 
-module.exports = function Clock(view) {
-	'use strict';
-	
-	var timer = new Timer(25);
-	var breakTimer = new Timer(5);
-	var interval;
-	var inProgress = false;
-	var breakTime = false;
-	var paused = false;
-	var minutes;
-	var seconds;
-
-
-	var init = function() {
-		view.init();
-		view.renderTime(timer.getLength())
+export default class Clock {
+	constructor(view) {
+		this.view = view;
+		this.timer = new Timer(25);
+		this.breakTimer = new Timer(5);
+		this.interval;
+		this.inProgress = false;
+		this.breakTime = false;
+		this.paused = false;
+		this.minutes;
+		this.seconds;
 	}
 
-	var getTimeRemaining = function(deadline) { 
-		minutes = Math.floor((deadline - Date.parse(new Date()))/60000); 
-		seconds = Math.floor(((deadline - Date.parse(new Date()))/1000) % 60);
-		return seconds >= 10 ? minutes + ':' + seconds : minutes + ':0' + seconds
-  	}
 
-  	var clockInterval = function(deadline) {
-  		interval = setInterval(function() {
-    		var timeRemaining = getTimeRemaining(deadline);
-    		view.renderTime(timeRemaining);  
-    		if(minutes + seconds === 0) switchToBreak();    
-      	}, 1000);
-  	}
+	init() {
+		this.view.init();
+		this.view.renderTime(this.timer.getLength());
+	}
 
-  	var switchToBreak = function() {
-		inProgress = false;
-		if(!breakTime) {
-			clearInterval(interval);
-			breakTime = true;
-			this.tickTock(breakTimer.getLength());	
+	getTimeRemaining(deadline) { 
+		this.minutes = Math.floor((deadline - Date.parse(new Date()))/60000); 
+		this.seconds = Math.floor(((deadline - Date.parse(new Date()))/1000) % 60);
+		return this.seconds >= 10 ? this.minutes + ":" + this.seconds : this.minutes + ":0" + this.seconds;
+	}
+
+	clockInterval(deadline) {
+		this.interval = setInterval(() => {
+			const timeRemaining = this.getTimeRemaining(deadline);
+			this.view.renderTime(timeRemaining);  
+			if(this.minutes + this.seconds === 0) this.switchToBreak();    
+		}, 1000);
+	}
+
+	switchToBreak() {
+		this.inProgress = false;
+		if(!this.breakTime) {
+			clearInterval(this.interval);
+			this.breakTime = true;
+			this.tickTock(this.breakTimer.getLength());	
 		} else {
 			this.reset();
 		}
 	}	
 
-  	this.tickTock = function() {
-  		var current = breakTime ? breakTimer : timer; 
-  		if(!inProgress) {
-  			inProgress = true;
-  			var deadline = Date.parse(new Date()) + (current.getLength()*60*1000); 
-  			clockInterval(deadline);     		
-  		}	
-    }
-
-    this.pause = function() {
-      	if(!paused) {	
-        	clearInterval(interval);
-      	} else {
-        	var deadline = Date.parse(new Date()) + (minutes*60*1000) + (seconds * 1000); 
-        	clockInterval(deadline);     
-      	}
-      	paused = !paused;
-    }
-
-    this.addOneMinute = function(num) {
-    	var length = timer.addMinute(num) || 1;
-    	view.renderTimeSet(length);
-    	if(!inProgress) view.renderTime(length)
-    }
-
-	this.addBreakMinute = function(num) {
-		var length = breakTimer.addMinute(num) || 1;
-		view.renderBreakSet(length);
+	tickTock() {
+		const current = this.breakTime ? this.breakTimer : this.timer; 
+		if(!this.inProgress) {
+			this.inProgress = true;
+			const deadline = Date.parse(new Date()) + (current.getLength()*60*1000); 
+			this.clockInterval(deadline);     		
+		}	
 	}
 
-	this.reset = function() {
-		clearInterval(interval);
-      	paused = breakTime = inProgress = false;
-      	view.renderTime(timer.getLength());
+	pause() {
+		if(!this.paused) {	
+			clearInterval(this.interval);
+		} else {
+			const deadline = Date.parse(new Date()) + (this.minutes*60*1000) + (this.seconds * 1000); 
+			this.clockInterval(deadline);     
+		}
+		this.paused = !this.paused;
 	}
 
-	init();
+	addOneMinute(num) {
+		const length = this.timer.addMinute(num) || 1;
+		this.view.renderTimeSet(length);
+		if(!this.inProgress) this.view.renderTime(length);
+	}
+
+	addBreakMinute(num) {
+		const length = this.breakTimer.addMinute(num) || 1;
+		this.view.renderBreakSet(length);
+	}
+
+	reset() {
+		clearInterval(this.interval);
+		this.paused = this.breakTime = this.inProgress = false;
+		this.view.renderTime(this.timer.getLength());
+	}
+
 }
+
+

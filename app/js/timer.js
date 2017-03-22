@@ -1,13 +1,17 @@
-module.exports = function Timer(num) {
-	'use strict';
-		
-	var length = num;
+
+
+export default class Timer {
+	constructor(num) {
+		this.length = num;
+	}
+
+	getLength() {
+		return this.length;
+	}
 	
-	this.getLength = ()=> length;
-	
-	this.addMinute = (num)=> {
-		if(length === 1 && num < 0);
-		else return length += num;
+	addMinute(num) {
+		if(this.length === 1 && num < 0);
+		else return this.length += num;
 	}
 
 }

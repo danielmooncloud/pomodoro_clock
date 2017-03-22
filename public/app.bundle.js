@@ -73,88 +73,118 @@
 "use strict";
 
 
-var Timer = __webpack_require__(3);
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
 
-module.exports = function Clock(view) {
-	'use strict';
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var timer = new Timer(25);
-	var breakTimer = new Timer(5);
-	var interval;
-	var inProgress = false;
-	var breakTime = false;
-	var paused = false;
-	var minutes;
-	var seconds;
+var _timer = __webpack_require__(3);
 
-	var init = function init() {
-		view.init();
-		view.renderTime(timer.getLength());
-	};
+var _timer2 = _interopRequireDefault(_timer);
 
-	var getTimeRemaining = function getTimeRemaining(deadline) {
-		minutes = Math.floor((deadline - Date.parse(new Date())) / 60000);
-		seconds = Math.floor((deadline - Date.parse(new Date())) / 1000 % 60);
-		return seconds >= 10 ? minutes + ':' + seconds : minutes + ':0' + seconds;
-	};
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var clockInterval = function clockInterval(deadline) {
-		interval = setInterval(function () {
-			var timeRemaining = getTimeRemaining(deadline);
-			view.renderTime(timeRemaining);
-			if (minutes + seconds === 0) switchToBreak();
-		}, 1000);
-	};
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var switchToBreak = function switchToBreak() {
-		inProgress = false;
-		if (!breakTime) {
-			clearInterval(interval);
-			breakTime = true;
-			this.tickTock(breakTimer.getLength());
-		} else {
-			this.reset();
+var Clock = function () {
+	function Clock(view) {
+		_classCallCheck(this, Clock);
+
+		this.view = view;
+		this.timer = new _timer2.default(25);
+		this.breakTimer = new _timer2.default(5);
+		this.interval;
+		this.inProgress = false;
+		this.breakTime = false;
+		this.paused = false;
+		this.minutes;
+		this.seconds;
+	}
+
+	_createClass(Clock, [{
+		key: "init",
+		value: function init() {
+			this.view.init();
+			this.view.renderTime(this.timer.getLength());
 		}
-	};
-
-	this.tickTock = function () {
-		var current = breakTime ? breakTimer : timer;
-		if (!inProgress) {
-			inProgress = true;
-			var deadline = Date.parse(new Date()) + current.getLength() * 60 * 1000;
-			clockInterval(deadline);
+	}, {
+		key: "getTimeRemaining",
+		value: function getTimeRemaining(deadline) {
+			this.minutes = Math.floor((deadline - Date.parse(new Date())) / 60000);
+			this.seconds = Math.floor((deadline - Date.parse(new Date())) / 1000 % 60);
+			return this.seconds >= 10 ? this.minutes + ":" + this.seconds : this.minutes + ":0" + this.seconds;
 		}
-	};
+	}, {
+		key: "clockInterval",
+		value: function clockInterval(deadline) {
+			var _this = this;
 
-	this.pause = function () {
-		if (!paused) {
-			clearInterval(interval);
-		} else {
-			var deadline = Date.parse(new Date()) + minutes * 60 * 1000 + seconds * 1000;
-			clockInterval(deadline);
+			this.interval = setInterval(function () {
+				var timeRemaining = _this.getTimeRemaining(deadline);
+				_this.view.renderTime(timeRemaining);
+				if (_this.minutes + _this.seconds === 0) _this.switchToBreak();
+			}, 1000);
 		}
-		paused = !paused;
-	};
+	}, {
+		key: "switchToBreak",
+		value: function switchToBreak() {
+			this.inProgress = false;
+			if (!this.breakTime) {
+				clearInterval(this.interval);
+				this.breakTime = true;
+				this.tickTock(this.breakTimer.getLength());
+			} else {
+				this.reset();
+			}
+		}
+	}, {
+		key: "tickTock",
+		value: function tickTock() {
+			var current = this.breakTime ? this.breakTimer : this.timer;
+			if (!this.inProgress) {
+				this.inProgress = true;
+				var deadline = Date.parse(new Date()) + current.getLength() * 60 * 1000;
+				this.clockInterval(deadline);
+			}
+		}
+	}, {
+		key: "pause",
+		value: function pause() {
+			if (!this.paused) {
+				clearInterval(this.interval);
+			} else {
+				var deadline = Date.parse(new Date()) + this.minutes * 60 * 1000 + this.seconds * 1000;
+				this.clockInterval(deadline);
+			}
+			this.paused = !this.paused;
+		}
+	}, {
+		key: "addOneMinute",
+		value: function addOneMinute(num) {
+			var length = this.timer.addMinute(num) || 1;
+			this.view.renderTimeSet(length);
+			if (!this.inProgress) this.view.renderTime(length);
+		}
+	}, {
+		key: "addBreakMinute",
+		value: function addBreakMinute(num) {
+			var length = this.breakTimer.addMinute(num) || 1;
+			this.view.renderBreakSet(length);
+		}
+	}, {
+		key: "reset",
+		value: function reset() {
+			clearInterval(this.interval);
+			this.paused = this.breakTime = this.inProgress = false;
+			this.view.renderTime(this.timer.getLength());
+		}
+	}]);
 
-	this.addOneMinute = function (num) {
-		var length = timer.addMinute(num) || 1;
-		view.renderTimeSet(length);
-		if (!inProgress) view.renderTime(length);
-	};
+	return Clock;
+}();
 
-	this.addBreakMinute = function (num) {
-		var length = breakTimer.addMinute(num) || 1;
-		view.renderBreakSet(length);
-	};
-
-	this.reset = function () {
-		clearInterval(interval);
-		paused = breakTime = inProgress = false;
-		view.renderTime(timer.getLength());
-	};
-
-	init();
-};
+exports.default = Clock;
 
 /***/ }),
 /* 1 */
@@ -10005,19 +10035,37 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 "use strict";
 
 
-module.exports = function Timer(num) {
-	'use strict';
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
 
-	var length = num;
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	this.getLength = function () {
-		return length;
-	};
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	this.addMinute = function (num) {
-		if (length === 1 && num < 0) ;else return length += num;
-	};
-};
+var Timer = function () {
+	function Timer(num) {
+		_classCallCheck(this, Timer);
+
+		this.length = num;
+	}
+
+	_createClass(Timer, [{
+		key: "getLength",
+		value: function getLength() {
+			return this.length;
+		}
+	}, {
+		key: "addMinute",
+		value: function addMinute(num) {
+			if (this.length === 1 && num < 0) ;else return this.length += num;
+		}
+	}]);
+
+	return Timer;
+}();
+
+exports.default = Timer;
 
 /***/ }),
 /* 4 */
@@ -10057,65 +10105,71 @@ module.exports = function (module) {
 /* WEBPACK VAR INJECTION */(function($) {
 
 __webpack_require__(2);
-var Clock = __webpack_require__(0);
 
-var view = {
-	init: function init() {
-		this.cacheDom();
-		this.bindEvents();
-	},
+var _clock = __webpack_require__(0);
 
-	cacheDom: function cacheDom() {
-		this.$header = $('.header');
-		this.$lower = $('.lower');
-		this.$start = this.$header.find('.start');
-		this.$pause = this.$header.find('.pause');
-		this.$reset = this.$header.find('.reset');
-		this.$clock = this.$lower.find('.clock');
-		this.$sub = this.$lower.find('.sub');
-		this.$add = this.$lower.find('.add');
-		this.$subbreak = this.$lower.find('.subbreak');
-		this.$addbreak = this.$lower.find('.addbreak');
-		this.$timeset = this.$lower.find('.timeset');
-		this.$breakset = this.$lower.find('.breakset');
-	},
+var _clock2 = _interopRequireDefault(_clock);
 
-	bindEvents: function bindEvents() {
-		this.$start.click(function () {
-			clock.tickTock();
-		});
-		this.$pause.click(function () {
-			clock.pause();
-		});
-		this.$reset.click(function () {
-			clock.reset();
-		});
-		this.$add.click(function () {
-			clock.addOneMinute(1);
-		});
-		this.$sub.click(function () {
-			clock.addOneMinute(-1);
-		});
-		this.$addbreak.click(function () {
-			clock.addBreakMinute(1);
-		});
-		this.$subbreak.click(function () {
-			clock.addBreakMinute(-1);
-		});
-	},
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	renderTime: function renderTime(time) {
-		view.$clock.html('<h1>' + time + '</h1>');
-	},
-	renderTimeSet: function renderTimeSet(length) {
-		view.$timeset.html('<h3>' + length + '</h3>');
-	},
-	renderBreakSet: function renderBreakSet(length) {
-		view.$breakset.html('<h3>' + length + '</h3>');
-	}
-};
+$(document).ready(function () {
 
-var clock = new Clock(view);
+	var view = {
+		init: function init() {
+			this.cacheDom();
+			this.bindEvents();
+		},
+		cacheDom: function cacheDom() {
+			this.$header = $(".header");
+			this.$lower = $(".lower");
+			this.$start = this.$header.find(".start");
+			this.$pause = this.$header.find(".pause");
+			this.$reset = this.$header.find(".reset");
+			this.$clock = this.$lower.find(".clock");
+			this.$sub = this.$lower.find(".sub");
+			this.$add = this.$lower.find(".add");
+			this.$subbreak = this.$lower.find(".subbreak");
+			this.$addbreak = this.$lower.find(".addbreak");
+			this.$timeset = this.$lower.find(".timeset");
+			this.$breakset = this.$lower.find(".breakset");
+		},
+		bindEvents: function bindEvents() {
+			this.$start.click(function () {
+				clock.tickTock();
+			});
+			this.$pause.click(function () {
+				clock.pause();
+			});
+			this.$reset.click(function () {
+				clock.reset();
+			});
+			this.$add.click(function () {
+				clock.addOneMinute(1);
+			});
+			this.$sub.click(function () {
+				clock.addOneMinute(-1);
+			});
+			this.$addbreak.click(function () {
+				clock.addBreakMinute(1);
+			});
+			this.$subbreak.click(function () {
+				clock.addBreakMinute(-1);
+			});
+		},
+		renderTime: function renderTime(time) {
+			this.$clock.html("<h1>" + time + "</h1>");
+		},
+		renderTimeSet: function renderTimeSet(length) {
+			this.$timeset.html("<h3>" + length + "</h3>");
+		},
+		renderBreakSet: function renderBreakSet(length) {
+			this.$breakset.html("<h3>" + length + "</h3>");
+		}
+	};
+
+	var clock = new _clock2.default(view);
+	clock.init();
+});
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ })
