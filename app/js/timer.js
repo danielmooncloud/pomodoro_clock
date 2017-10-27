@@ -10,8 +10,7 @@ export default class Timer {
 	}
 	
 	addMinute(num) {
-		if(this.length === 1 && num < 0);
-		else return this.length += num;
+		if(this.length !== 1 || num >= 0) return this.length += num;
 	}
 
 }
