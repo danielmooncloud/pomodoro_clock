@@ -88,10 +88,10 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Clock = function () {
-	function Clock(view) {
+	function Clock() {
 		_classCallCheck(this, Clock);
 
-		this.view = view;
+		this._view;
 		this.timer = new _timer2.default(25);
 		this.breakTimer = new _timer2.default(5);
 		this.interval;
@@ -104,7 +104,8 @@ var Clock = function () {
 
 	_createClass(Clock, [{
 		key: "init",
-		value: function init() {
+		value: function init(view) {
+			this._view = view;
 			this.view.init();
 			this.view.renderTime(this.timer.getLength());
 		}
@@ -178,6 +179,14 @@ var Clock = function () {
 			clearInterval(this.interval);
 			this.paused = this.breakTime = this.inProgress = false;
 			this.view.renderTime(this.timer.getLength());
+		}
+	}, {
+		key: "view",
+		get: function get() {
+			return this._view;
+		},
+		set: function set(view) {
+			this._view = view;
 		}
 	}]);
 
@@ -10026,7 +10035,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 /* 2 */
 /***/ (function(module, exports) {
 
-// removed by extract-text-webpack-plugin
+throw new Error("Module build failed: Error\n    at /Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/webpack/lib/NormalModule.js:141:35\n    at /Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/loader-runner/lib/LoaderRunner.js:364:11\n    at /Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/loader-runner/lib/LoaderRunner.js:170:18\n    at loadLoader (/Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/loader-runner/lib/loadLoader.js:27:11)\n    at iteratePitchingLoaders (/Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/loader-runner/lib/LoaderRunner.js:169:2)\n    at iteratePitchingLoaders (/Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/loader-runner/lib/LoaderRunner.js:165:10)\n    at /Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/loader-runner/lib/LoaderRunner.js:173:18\n    at loadLoader (/Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/loader-runner/lib/loadLoader.js:36:3)\n    at iteratePitchingLoaders (/Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/loader-runner/lib/LoaderRunner.js:169:2)\n    at iteratePitchingLoaders (/Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/loader-runner/lib/LoaderRunner.js:165:10)\n    at /Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/loader-runner/lib/LoaderRunner.js:173:18\n    at loadLoader (/Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/loader-runner/lib/loadLoader.js:36:3)\n    at iteratePitchingLoaders (/Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/loader-runner/lib/LoaderRunner.js:169:2)\n    at runLoaders (/Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/loader-runner/lib/LoaderRunner.js:362:2)\n    at NormalModule.doBuild (/Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/webpack/lib/NormalModule.js:129:2)\n    at NormalModule.build (/Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/webpack/lib/NormalModule.js:180:15)\n    at Compilation.buildModule (/Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/webpack/lib/Compilation.js:142:10)\n    at moduleFactory.create (/Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/webpack/lib/Compilation.js:424:9)\n    at /Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/webpack/lib/NormalModuleFactory.js:242:4\n    at /Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/webpack/lib/NormalModuleFactory.js:93:13\n    at /Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/tapable/lib/Tapable.js:204:11\n    at NormalModuleFactory.params.normalModuleFactory.plugin (/Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/webpack/lib/CompatibilityPlugin.js:52:5)\n    at NormalModuleFactory.applyPluginsAsyncWaterfall (/Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/tapable/lib/Tapable.js:208:13)\n    at onDoneResolving (/Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/webpack/lib/NormalModuleFactory.js:68:11)\n    at onDoneResolving (/Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/webpack/lib/NormalModuleFactory.js:189:6)\n    at _combinedTickCallback (internal/process/next_tick.js:131:7)\n    at process._tickCallback (internal/process/next_tick.js:180:9)");
 
 /***/ }),
 /* 3 */
@@ -10058,7 +10067,7 @@ var Timer = function () {
 	}, {
 		key: "addMinute",
 		value: function addMinute(num) {
-			if (this.length === 1 && num < 0) ;else return this.length += num;
+			if (this.length !== 1 || num >= 0) this.length += num;
 		}
 	}]);
 
@@ -10167,8 +10176,8 @@ $(document).ready(function () {
 		}
 	};
 
-	var clock = new _clock2.default(view);
-	clock.init();
+	var clock = new _clock2.default();
+	clock.init(view);
 });
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
