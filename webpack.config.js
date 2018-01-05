@@ -6,7 +6,7 @@ const ExtractJPG = new ExtractTextPlugin("/images/[name].jpg");
 
 module.exports = {
 	context: __dirname + "/app/js",
-	entry: "./app.js",
+	entry: "./index.js",
 	output: {
 		path: __dirname + "/public",
 		filename: "app.bundle.js",

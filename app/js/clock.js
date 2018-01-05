@@ -1,93 +1,123 @@
-import Timer from "./timer";
+import pubSub from "./pubsub";
 
 
 export default class Clock {
-	constructor() {
-		this._view;
-		this.timer = new Timer(25);
-		this.breakTimer = new Timer(5);
+	constructor(Timer) {
+		this.cacheDom();
+		this.bindEvents();
+		this.timeObject = {minutes: 1, seconds: 0};
+		this.breakTimeObject = {minutes: 1, seconds: 0};
+		this.timer = new Timer(this.timeObject);
+		this.breakTimer = new Timer(this.breakTimeObject);
+		this.currentTimer;
 		this.interval;
 		this.inProgress = false;
-		this.breakTime = false;
 		this.paused = false;
-		this.minutes;
-		this.seconds;
+		this.setTimer(this.timer);
+		this.updateTimerLength(0);
+		this.updateBreakTimerLength(0);
 	}
 
-	get view() {
-		return this._view;
+	cacheDom() {
+		this.$header = $(".header");
+		this.$lower = $(".lower");
+		this.$start = this.$header.find(".start");
+		this.$pause = this.$header.find(".pause");
+		this.$reset = this.$header.find(".reset");
+		this.$sub = this.$lower.find(".sub");
+		this.$add = this.$lower.find(".add");
+		this.$subbreak = this.$lower.find(".subbreak");
+		this.$addbreak = this.$lower.find(".addbreak");
 	}
 
-	set view(view) {
-		this._view = view;
+	bindEvents() {
+		this.$start.click(() => {
+			if(!this.inProgress) {
+				this.startTimerInterval();
+			}
+		});
+		this.$pause.click(() => {
+			this.pause();
+		});
+		this.$reset.click(() => {
+			this.reset();      
+		});
+		this.$add.click(() => {
+			this.updateTimerLength(1);
+		});
+		this.$sub.click(() => {
+			this.updateTimerLength(-1);
+		});
+		this.$addbreak.click(() => {
+			this.updateBreakTimerLength(1);
+		});
+		this.$subbreak.click(() => {
+			this.updateBreakTimerLength(-1);
+		});
 	}
 
-
-	init(view) {
-		this._view = view;
-		this.view.init();
-		this.view.renderTime(this.timer.getLength());
-	}
-
-	getTimeRemaining(deadline) { 
-		this.minutes = Math.floor((deadline - Date.parse(new Date()))/60000); 
-		this.seconds = Math.floor(((deadline - Date.parse(new Date()))/1000) % 60);
-		return this.seconds >= 10 ? this.minutes + ":" + this.seconds : this.minutes + ":0" + this.seconds;
-	}
-
-	clockInterval(deadline) {
+	startTimerInterval() {
+		this.inProgress = true;
+		this.currentTimer.start();
 		this.interval = setInterval(() => {
-			const timeRemaining = this.getTimeRemaining(deadline);
-			this.view.renderTime(timeRemaining);  
-			if(this.minutes + this.seconds === 0) this.switchToBreak();    
+			const {minutes, seconds} = this.currentTimer.getTimeRemaining();
+			const timeDisplay = seconds >= 10 ? minutes + ":" + seconds : minutes + ":0" + seconds;
+			pubSub.publish("updateTime", timeDisplay);
+			if(minutes + seconds === 0) {
+				this.switchToBreak();
+			}    
 		}, 1000);
 	}
 
 	switchToBreak() {
-		this.inProgress = false;
 		if(!this.breakTime) {
 			clearInterval(this.interval);
+			this.setTimer(this.breakTimer);
 			this.breakTime = true;
-			this.tickTock(this.breakTimer.getLength());	
+			this.startTimerInterval();
 		} else {
-			this.reset();
+			clearInterval(this.interval);
 		}
-	}	
+	}
 
-	tickTock() {
-		const current = this.breakTime ? this.breakTimer : this.timer; 
-		if(!this.inProgress) {
-			this.inProgress = true;
-			const deadline = Date.parse(new Date()) + (current.getLength()*60*1000); 
-			this.clockInterval(deadline);     		
-		}	
+	setTimer(timer) {
+		const {minutes, seconds} = timer;
+		this.currentTimer = timer;
+		const timeDisplay = seconds >= 10 ? minutes + ":" + seconds : minutes + ":0" + seconds;
+		pubSub.publish("updateTime", timeDisplay);
 	}
 
 	pause() {
 		if(!this.paused) {	
 			clearInterval(this.interval);
 		} else {
-			const deadline = Date.parse(new Date()) + (this.minutes*60*1000) + (this.seconds * 1000); 
-			this.clockInterval(deadline);     
+			this.startTimerInterval();     
 		}
 		this.paused = !this.paused;
 	}
 
-	addOneMinute(num) {
-		const length = this.timer.addMinute(num) || 1;
-		this.view.renderTimeSet(length);
-		if(!this.inProgress) this.view.renderTime(length);
+	updateTimerLength(num) {
+		this.timeObject.minutes = Math.max(this.timeObject.minutes + num, 1);
+		const {minutes, seconds} = this.timeObject;
+		const timeDisplay = seconds >= 10 ? minutes + ":" + seconds : minutes + ":0" + seconds;
+		pubSub.publish("updateTimerLength", timeDisplay);
+		if(!this.inProgress) this.reset();
 	}
 
-	addBreakMinute(num) {
-		const length = this.breakTimer.addMinute(num) || 1;
-		this.view.renderBreakSet(length);
+	updateBreakTimerLength(num) {
+		this.breakTimeObject.minutes = Math.max(this.breakTimeObject.minutes + num, 1);
+		const {minutes, seconds} = this.breakTimeObject;
+		const timeDisplay = seconds >= 10 ? minutes + ":" + seconds : minutes + ":0" + seconds;
+		pubSub.publish("updateBreakTimerLength", timeDisplay);
+		if(!this.breakTime) this.breakTimer.reset(this.breakTimeObject);
 	}
 
 	reset() {
 		clearInterval(this.interval);
-		this.paused = this.breakTime = this.inProgress = false;
-		this.view.renderTime(this.timer.getLength());
+		this.paused = this.inProgress = false;
+		this.timer.reset(this.timeObject);
+		this.breakTimer.reset(this.breakTimeObject);
+		this.setTimer(this.timer);
 	}
 
 }
