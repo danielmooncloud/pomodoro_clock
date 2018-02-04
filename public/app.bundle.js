@@ -6,9 +6,9 @@
 /******/ 	function __webpack_require__(moduleId) {
 /******/
 /******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId])
+/******/ 		if(installedModules[moduleId]) {
 /******/ 			return installedModules[moduleId].exports;
-/******/
+/******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
 /******/ 			i: moduleId,
@@ -63,140 +63,11 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 5);
+/******/ 	return __webpack_require__(__webpack_require__.s = 6);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _timer = __webpack_require__(3);
-
-var _timer2 = _interopRequireDefault(_timer);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Clock = function () {
-	function Clock() {
-		_classCallCheck(this, Clock);
-
-		this._view;
-		this.timer = new _timer2.default(25);
-		this.breakTimer = new _timer2.default(5);
-		this.interval;
-		this.inProgress = false;
-		this.breakTime = false;
-		this.paused = false;
-		this.minutes;
-		this.seconds;
-	}
-
-	_createClass(Clock, [{
-		key: "init",
-		value: function init(view) {
-			this._view = view;
-			this.view.init();
-			this.view.renderTime(this.timer.getLength());
-		}
-	}, {
-		key: "getTimeRemaining",
-		value: function getTimeRemaining(deadline) {
-			this.minutes = Math.floor((deadline - Date.parse(new Date())) / 60000);
-			this.seconds = Math.floor((deadline - Date.parse(new Date())) / 1000 % 60);
-			return this.seconds >= 10 ? this.minutes + ":" + this.seconds : this.minutes + ":0" + this.seconds;
-		}
-	}, {
-		key: "clockInterval",
-		value: function clockInterval(deadline) {
-			var _this = this;
-
-			this.interval = setInterval(function () {
-				var timeRemaining = _this.getTimeRemaining(deadline);
-				_this.view.renderTime(timeRemaining);
-				if (_this.minutes + _this.seconds === 0) _this.switchToBreak();
-			}, 1000);
-		}
-	}, {
-		key: "switchToBreak",
-		value: function switchToBreak() {
-			this.inProgress = false;
-			if (!this.breakTime) {
-				clearInterval(this.interval);
-				this.breakTime = true;
-				this.tickTock(this.breakTimer.getLength());
-			} else {
-				this.reset();
-			}
-		}
-	}, {
-		key: "tickTock",
-		value: function tickTock() {
-			var current = this.breakTime ? this.breakTimer : this.timer;
-			if (!this.inProgress) {
-				this.inProgress = true;
-				var deadline = Date.parse(new Date()) + current.getLength() * 60 * 1000;
-				this.clockInterval(deadline);
-			}
-		}
-	}, {
-		key: "pause",
-		value: function pause() {
-			if (!this.paused) {
-				clearInterval(this.interval);
-			} else {
-				var deadline = Date.parse(new Date()) + this.minutes * 60 * 1000 + this.seconds * 1000;
-				this.clockInterval(deadline);
-			}
-			this.paused = !this.paused;
-		}
-	}, {
-		key: "addOneMinute",
-		value: function addOneMinute(num) {
-			var length = this.timer.addMinute(num) || 1;
-			this.view.renderTimeSet(length);
-			if (!this.inProgress) this.view.renderTime(length);
-		}
-	}, {
-		key: "addBreakMinute",
-		value: function addBreakMinute(num) {
-			var length = this.breakTimer.addMinute(num) || 1;
-			this.view.renderBreakSet(length);
-		}
-	}, {
-		key: "reset",
-		value: function reset() {
-			clearInterval(this.interval);
-			this.paused = this.breakTime = this.inProgress = false;
-			this.view.renderTime(this.timer.getLength());
-		}
-	}, {
-		key: "view",
-		get: function get() {
-			return this._view;
-		},
-		set: function set(view) {
-			this._view = view;
-		}
-	}]);
-
-	return Clock;
-}();
-
-exports.default = Clock;
-
-/***/ }),
-/* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10029,16 +9900,400 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 	return jQuery;
 });
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8)(module)))
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+
+var pubSub = {
+
+	events: {},
+
+	subscribe: function subscribe(eventName, fn) {
+		this.events[eventName] = this.events[eventName] || [];
+		this.events[eventName].push(fn);
+	},
+	unsubscribe: function unsubscribe(eventName, fn) {
+		var _this = this;
+
+		if (this.events[eventName]) {
+			this.events[eventName].forEach(function (fxn, i) {
+				if (fxn === fn) {
+					_this.events[eventName].splice(i, 1);
+				}
+			});
+		}
+	},
+	publish: function publish(eventName, data) {
+		if (this.events[eventName]) {
+			this.events[eventName].forEach(function (fn) {
+				fn(data);
+			});
+		}
+	}
+};
+
+exports.default = pubSub;
 
 /***/ }),
 /* 2 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-throw new Error("Module build failed: Error\n    at /Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/webpack/lib/NormalModule.js:141:35\n    at /Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/loader-runner/lib/LoaderRunner.js:364:11\n    at /Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/loader-runner/lib/LoaderRunner.js:170:18\n    at loadLoader (/Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/loader-runner/lib/loadLoader.js:27:11)\n    at iteratePitchingLoaders (/Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/loader-runner/lib/LoaderRunner.js:169:2)\n    at iteratePitchingLoaders (/Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/loader-runner/lib/LoaderRunner.js:165:10)\n    at /Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/loader-runner/lib/LoaderRunner.js:173:18\n    at loadLoader (/Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/loader-runner/lib/loadLoader.js:36:3)\n    at iteratePitchingLoaders (/Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/loader-runner/lib/LoaderRunner.js:169:2)\n    at iteratePitchingLoaders (/Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/loader-runner/lib/LoaderRunner.js:165:10)\n    at /Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/loader-runner/lib/LoaderRunner.js:173:18\n    at loadLoader (/Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/loader-runner/lib/loadLoader.js:36:3)\n    at iteratePitchingLoaders (/Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/loader-runner/lib/LoaderRunner.js:169:2)\n    at runLoaders (/Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/loader-runner/lib/LoaderRunner.js:362:2)\n    at NormalModule.doBuild (/Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/webpack/lib/NormalModule.js:129:2)\n    at NormalModule.build (/Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/webpack/lib/NormalModule.js:180:15)\n    at Compilation.buildModule (/Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/webpack/lib/Compilation.js:142:10)\n    at moduleFactory.create (/Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/webpack/lib/Compilation.js:424:9)\n    at /Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/webpack/lib/NormalModuleFactory.js:242:4\n    at /Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/webpack/lib/NormalModuleFactory.js:93:13\n    at /Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/tapable/lib/Tapable.js:204:11\n    at NormalModuleFactory.params.normalModuleFactory.plugin (/Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/webpack/lib/CompatibilityPlugin.js:52:5)\n    at NormalModuleFactory.applyPluginsAsyncWaterfall (/Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/tapable/lib/Tapable.js:208:13)\n    at onDoneResolving (/Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/webpack/lib/NormalModuleFactory.js:68:11)\n    at onDoneResolving (/Users/danielsousa/Desktop/freecodecamp/Front_End/Advanced/Pomodoro_clock/node_modules/webpack/lib/NormalModuleFactory.js:189:6)\n    at _combinedTickCallback (internal/process/next_tick.js:131:7)\n    at process._tickCallback (internal/process/next_tick.js:180:9)");
+"use strict";
+/* WEBPACK VAR INJECTION */(function($) {
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _clock = __webpack_require__(5);
+
+var _clock2 = _interopRequireDefault(_clock);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Controller = function () {
+	function Controller(initialTimeObject, initialBreakTimeObject) {
+		_classCallCheck(this, Controller);
+
+		this.clock = new _clock2.default(initialTimeObject, initialBreakTimeObject);
+		this.cacheDom();
+		this.bindEvents();
+	}
+
+	_createClass(Controller, [{
+		key: "cacheDom",
+		value: function cacheDom() {
+			this.$header = $(".header");
+			this.$lower = $(".lower");
+			this.$start = this.$header.find(".start");
+			this.$pause = this.$header.find(".pause");
+			this.$reset = this.$header.find(".reset");
+			this.$sub = this.$lower.find(".sub");
+			this.$add = this.$lower.find(".add");
+			this.$subbreak = this.$lower.find(".subbreak");
+			this.$addbreak = this.$lower.find(".addbreak");
+		}
+	}, {
+		key: "bindEvents",
+		value: function bindEvents() {
+			var _this = this;
+
+			this.$start.click(function () {
+				if (!_this.clock.inProgress) _this.clock.startTimerInterval();
+			});
+			this.$pause.click(function () {
+				_this.clock.pause();
+			});
+			this.$reset.click(function () {
+				_this.clock.reset();
+			});
+			//Adjust the main timer
+			this.$add.click(function () {
+				_this.clock.updateMainTimerLength(1);
+			});
+			this.$sub.click(function () {
+				_this.clock.updateTimerLength(-1);
+			});
+			//Adjust the break timer
+			this.$addbreak.click(function () {
+				_this.clock.updateBreakTimerLength(1);
+			});
+			this.$subbreak.click(function () {
+				_this.clock.updateBreakTimerLength(-1);
+			});
+		}
+	}]);
+
+	return Controller;
+}();
+
+exports.default = Controller;
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
 /* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function($) {
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _pubsub = __webpack_require__(1);
+
+var _pubsub2 = _interopRequireDefault(_pubsub);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var View = function () {
+	function View() {
+		_classCallCheck(this, View);
+
+		this.cacheDom();
+		this.bindEvents();
+	}
+
+	_createClass(View, [{
+		key: "cacheDom",
+		value: function cacheDom() {
+			this.$lower = $(".lower");
+			this.$clock = this.$lower.find(".clock");
+			this.$timeset = this.$lower.find(".timeset");
+			this.$breakset = this.$lower.find(".breakset");
+		}
+	}, {
+		key: "bindEvents",
+		value: function bindEvents() {
+			var _this = this;
+
+			_pubsub2.default.subscribe("updateTime", function (timeDisplay) {
+				_this.renderTime(timeDisplay);
+			});
+			_pubsub2.default.subscribe("updateTimerLength", function (timeDisplay) {
+				_this.renderTimeSet(timeDisplay);
+			});
+			_pubsub2.default.subscribe("updateBreakTimerLength", function (timeDisplay) {
+				_this.renderBreakSet(timeDisplay);
+			});
+		}
+	}, {
+		key: "renderTime",
+		value: function renderTime(timeDisplay) {
+			this.$clock.html("<h1>" + timeDisplay + "</h1>");
+		}
+	}, {
+		key: "renderTimeSet",
+		value: function renderTimeSet(timeDisplay) {
+			this.$timeset.html("<h3>" + timeDisplay + "</h3>");
+		}
+	}, {
+		key: "renderBreakSet",
+		value: function renderBreakSet(timeDisplay) {
+			this.$breakset.html("<h3>" + timeDisplay + "</h3>");
+		}
+	}]);
+
+	return View;
+}();
+
+exports.default = View;
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _pubsub = __webpack_require__(1);
+
+var _pubsub2 = _interopRequireDefault(_pubsub);
+
+var _timer = __webpack_require__(7);
+
+var _timer2 = _interopRequireDefault(_timer);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Clock = function () {
+	function Clock(initialTimeObject, initialBreakTimeObject) {
+		_classCallCheck(this, Clock);
+
+		this.timeObject = initialTimeObject;
+		this.breakTimeObject = initialBreakTimeObject;
+		this.mainTimer = new _timer2.default(this.timeObject);
+		this.breakTimer = new _timer2.default(this.breakTimeObject);
+		this.currentTimer;
+		this.interval;
+		this.inProgress = false;
+		this.paused = false;
+		this.breakTime = false;
+		this.setCurrentTimer(this.mainTimer);
+		this.updateMainTimerLength(0);
+		this.updateBreakTimerLength(0);
+	}
+
+	//starts the clock
+
+
+	_createClass(Clock, [{
+		key: "startTimerInterval",
+		value: function startTimerInterval() {
+			var _this = this;
+
+			//Lets us know the clock is currently counting
+			this.inProgress = true;
+			//Creates a reference point for the starting time
+			this.currentTimer.start();
+			//Starts the countdown
+			this.interval = setInterval(function () {
+				//Grab the remaining time data from the timer
+				var _currentTimer$getTime = _this.currentTimer.getTimeRemaining(),
+				    minutes = _currentTimer$getTime.minutes,
+				    seconds = _currentTimer$getTime.seconds;
+				//Formats the time data for the view
+
+
+				var timeDisplay = _this.formatTime({ minutes: minutes, seconds: seconds });
+				_pubsub2.default.publish("updateTime", timeDisplay);
+				//Stop or switch timers when the time runs out
+				if (minutes + seconds === 0) {
+					_this.endsTimer();
+				}
+			}, 1000);
+		}
+
+		//Handles cases when the timer's run out of time
+
+	}, {
+		key: "endsTimer",
+		value: function endsTimer() {
+			clearInterval(this.interval);
+			if (!this.breakTime) {
+				//Start Breaktime
+				this.setCurrentTimer(this.breakTimer);
+				this.breakTime = true;
+				this.startTimerInterval();
+			} else {
+				//Lets us know the clock is no longer counting
+				this.inProgress = false;
+			}
+		}
+	}, {
+		key: "setCurrentTimer",
+		value: function setCurrentTimer(timer) {
+			//Gets the time (in minutes and seconds) that the timer is set to
+			var minutes = timer.minutes,
+			    seconds = timer.seconds;
+			//formats the time into a string
+
+			var timeDisplay = this.formatTime({ minutes: minutes, seconds: seconds });
+			this.currentTimer = timer;
+			_pubsub2.default.publish("updateTime", timeDisplay);
+		}
+	}, {
+		key: "pause",
+		value: function pause() {
+			//Is the game already paused ? Start the clock again : pause the clock
+			this.paused ? this.startTimerInterval() : clearInterval(this.interval);
+			this.paused = !this.paused;
+		}
+	}, {
+		key: "updateMainTimerLength",
+		value: function updateMainTimerLength(num) {
+			//The timers cannot have 0 or negative time
+			this.timeObject.minutes = Math.max(this.timeObject.minutes + num, 1);
+			var timeDisplay = this.formatTime(this.timeObject);
+			_pubsub2.default.publish("updateTimerLength", timeDisplay);
+			//If the clock isn't currently counting, update the time on the clock
+			if (!this.inProgress) this.reset();
+		}
+	}, {
+		key: "updateBreakTimerLength",
+		value: function updateBreakTimerLength(num) {
+			//The timers cannot have 0 or negative time
+			this.breakTimeObject.minutes = Math.max(this.breakTimeObject.minutes + num, 1);
+			var timeDisplay = this.formatTime(this.breakTimeObject);
+			_pubsub2.default.publish("updateBreakTimerLength", timeDisplay);
+			//If its not breaktime, update the breakTimer with the new time immediately
+			if (!this.breakTime) this.breakTimer.reset(this.breakTimeObject);
+		}
+	}, {
+		key: "reset",
+		value: function reset() {
+			//stop the clock
+			clearInterval(this.interval);
+			//reset the settings
+			this.paused = this.inProgress = false;
+			//reset the timers
+			this.mainTimer.reset(this.timeObject);
+			this.breakTimer.reset(this.breakTimeObject);
+			//set the current timer
+			this.setCurrentTimer(this.mainTimer);
+		}
+	}, {
+		key: "formatTime",
+		value: function formatTime(_ref) {
+			var minutes = _ref.minutes,
+			    seconds = _ref.seconds;
+
+			if (minutes >= 0 && seconds >= 0) {
+				return seconds >= 10 ? minutes + ":" + seconds : minutes + ":0" + seconds;
+			} else {
+				return "0:00";
+			}
+		}
+	}]);
+
+	return Clock;
+}();
+
+exports.default = Clock;
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function($) {
+
+__webpack_require__(4);
+
+var _controller = __webpack_require__(2);
+
+var _controller2 = _interopRequireDefault(_controller);
+
+var _view = __webpack_require__(3);
+
+var _view2 = _interopRequireDefault(_view);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+$(document).ready(function () {
+	var initialTimeObject = { minutes: 5, seconds: 0 };
+	var initialBreakTimeObject = { minutes: 5, seconds: 0 };
+	new _view2.default();
+	new _controller2.default(initialTimeObject, initialBreakTimeObject);
+});
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
+
+/***/ }),
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10053,21 +10308,33 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Timer = function () {
-	function Timer(num) {
+	function Timer(timeObject) {
 		_classCallCheck(this, Timer);
 
-		this.length = num;
+		this.minutes = timeObject.minutes;
+		this.seconds = timeObject.seconds;
+		this.deadline;
 	}
 
 	_createClass(Timer, [{
-		key: "getLength",
-		value: function getLength() {
-			return this.length;
+		key: "start",
+		value: function start() {
+			this.deadline = Date.parse(new Date()) + (this.minutes * 60 * 1000 + this.seconds * 1000);
 		}
 	}, {
-		key: "addMinute",
-		value: function addMinute(num) {
-			if (this.length !== 1 || num >= 0) this.length += num;
+		key: "reset",
+		value: function reset(timeObject) {
+			this.minutes = timeObject.minutes;
+			this.seconds = timeObject.seconds;
+		}
+	}, {
+		key: "getTimeRemaining",
+		value: function getTimeRemaining() {
+			if (this.minutes + this.seconds >= 0) {
+				this.minutes = Math.floor((this.deadline - Date.parse(new Date())) / 60000);
+				this.seconds = Math.floor((this.deadline - Date.parse(new Date())) / 1000 % 60);
+			}
+			return { minutes: this.minutes, seconds: this.seconds };
 		}
 	}]);
 
@@ -10077,7 +10344,7 @@ var Timer = function () {
 exports.default = Timer;
 
 /***/ }),
-/* 4 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10105,81 +10372,6 @@ module.exports = function (module) {
 	}
 	return module;
 };
-
-/***/ }),
-/* 5 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function($) {
-
-__webpack_require__(2);
-
-var _clock = __webpack_require__(0);
-
-var _clock2 = _interopRequireDefault(_clock);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-$(document).ready(function () {
-
-	var view = {
-		init: function init() {
-			this.cacheDom();
-			this.bindEvents();
-		},
-		cacheDom: function cacheDom() {
-			this.$header = $(".header");
-			this.$lower = $(".lower");
-			this.$start = this.$header.find(".start");
-			this.$pause = this.$header.find(".pause");
-			this.$reset = this.$header.find(".reset");
-			this.$clock = this.$lower.find(".clock");
-			this.$sub = this.$lower.find(".sub");
-			this.$add = this.$lower.find(".add");
-			this.$subbreak = this.$lower.find(".subbreak");
-			this.$addbreak = this.$lower.find(".addbreak");
-			this.$timeset = this.$lower.find(".timeset");
-			this.$breakset = this.$lower.find(".breakset");
-		},
-		bindEvents: function bindEvents() {
-			this.$start.click(function () {
-				clock.tickTock();
-			});
-			this.$pause.click(function () {
-				clock.pause();
-			});
-			this.$reset.click(function () {
-				clock.reset();
-			});
-			this.$add.click(function () {
-				clock.addOneMinute(1);
-			});
-			this.$sub.click(function () {
-				clock.addOneMinute(-1);
-			});
-			this.$addbreak.click(function () {
-				clock.addBreakMinute(1);
-			});
-			this.$subbreak.click(function () {
-				clock.addBreakMinute(-1);
-			});
-		},
-		renderTime: function renderTime(time) {
-			this.$clock.html("<h1>" + time + "</h1>");
-		},
-		renderTimeSet: function renderTimeSet(length) {
-			this.$timeset.html("<h3>" + length + "</h3>");
-		},
-		renderBreakSet: function renderBreakSet(length) {
-			this.$breakset.html("<h3>" + length + "</h3>");
-		}
-	};
-
-	var clock = new _clock2.default();
-	clock.init(view);
-});
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ })
 /******/ ]);

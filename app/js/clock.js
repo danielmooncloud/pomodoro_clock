@@ -1,123 +1,117 @@
 import pubSub from "./pubsub";
+import Timer from "./timer";
+
 
 
 export default class Clock {
-	constructor(Timer) {
-		this.cacheDom();
-		this.bindEvents();
-		this.timeObject = {minutes: 1, seconds: 0};
-		this.breakTimeObject = {minutes: 1, seconds: 0};
-		this.timer = new Timer(this.timeObject);
+	constructor(initialTimeObject, initialBreakTimeObject) {
+		this.timeObject = initialTimeObject;
+		this.breakTimeObject = initialBreakTimeObject;
+		this.mainTimer = new Timer(this.timeObject);
 		this.breakTimer = new Timer(this.breakTimeObject);
 		this.currentTimer;
 		this.interval;
 		this.inProgress = false;
 		this.paused = false;
-		this.setTimer(this.timer);
-		this.updateTimerLength(0);
+		this.breakTime = false;
+		this.setCurrentTimer(this.mainTimer);
+		this.updateMainTimerLength(0);
 		this.updateBreakTimerLength(0);
 	}
 
-	cacheDom() {
-		this.$header = $(".header");
-		this.$lower = $(".lower");
-		this.$start = this.$header.find(".start");
-		this.$pause = this.$header.find(".pause");
-		this.$reset = this.$header.find(".reset");
-		this.$sub = this.$lower.find(".sub");
-		this.$add = this.$lower.find(".add");
-		this.$subbreak = this.$lower.find(".subbreak");
-		this.$addbreak = this.$lower.find(".addbreak");
-	}
 
-	bindEvents() {
-		this.$start.click(() => {
-			if(!this.inProgress) {
-				this.startTimerInterval();
-			}
-		});
-		this.$pause.click(() => {
-			this.pause();
-		});
-		this.$reset.click(() => {
-			this.reset();      
-		});
-		this.$add.click(() => {
-			this.updateTimerLength(1);
-		});
-		this.$sub.click(() => {
-			this.updateTimerLength(-1);
-		});
-		this.$addbreak.click(() => {
-			this.updateBreakTimerLength(1);
-		});
-		this.$subbreak.click(() => {
-			this.updateBreakTimerLength(-1);
-		});
-	}
-
+	//starts the clock
 	startTimerInterval() {
+		//Lets us know the clock is currently counting
 		this.inProgress = true;
+		//Creates a reference point for the starting time
 		this.currentTimer.start();
+		//Starts the countdown
 		this.interval = setInterval(() => {
+			//Grab the remaining time data from the timer
 			const {minutes, seconds} = this.currentTimer.getTimeRemaining();
-			const timeDisplay = seconds >= 10 ? minutes + ":" + seconds : minutes + ":0" + seconds;
+			//Formats the time data for the view
+			const timeDisplay = this.formatTime({minutes, seconds});
 			pubSub.publish("updateTime", timeDisplay);
+			//Stop or switch timers when the time runs out
 			if(minutes + seconds === 0) {
-				this.switchToBreak();
+				this.endsTimer();
 			}    
 		}, 1000);
 	}
 
-	switchToBreak() {
+
+	//Handles cases when the timer's run out of time
+	endsTimer() {
+		clearInterval(this.interval);
 		if(!this.breakTime) {
-			clearInterval(this.interval);
-			this.setTimer(this.breakTimer);
+			//Start Breaktime
+			this.setCurrentTimer(this.breakTimer);
 			this.breakTime = true;
 			this.startTimerInterval();
 		} else {
-			clearInterval(this.interval);
+			//Lets us know the clock is no longer counting
+			this.inProgress = false;
 		}
 	}
 
-	setTimer(timer) {
+
+	setCurrentTimer(timer) {
+		//Gets the time (in minutes and seconds) that the timer is set to
 		const {minutes, seconds} = timer;
+		//formats the time into a string
+		const timeDisplay = this.formatTime({minutes, seconds});
 		this.currentTimer = timer;
-		const timeDisplay = seconds >= 10 ? minutes + ":" + seconds : minutes + ":0" + seconds;
 		pubSub.publish("updateTime", timeDisplay);
 	}
 
+
 	pause() {
-		if(!this.paused) {	
-			clearInterval(this.interval);
-		} else {
-			this.startTimerInterval();     
-		}
+		//Is the game already paused ? Start the clock again : pause the clock
+		this.paused ? this.startTimerInterval() : clearInterval(this.interval);
 		this.paused = !this.paused;
 	}
 
-	updateTimerLength(num) {
+
+	updateMainTimerLength(num) {
+		//The timers cannot have 0 or negative time
 		this.timeObject.minutes = Math.max(this.timeObject.minutes + num, 1);
-		const {minutes, seconds} = this.timeObject;
-		const timeDisplay = seconds >= 10 ? minutes + ":" + seconds : minutes + ":0" + seconds;
+		const timeDisplay = this.formatTime(this.timeObject);
 		pubSub.publish("updateTimerLength", timeDisplay);
+		//If the clock isn't currently counting, update the time on the clock
 		if(!this.inProgress) this.reset();
 	}
 
+
 	updateBreakTimerLength(num) {
+		//The timers cannot have 0 or negative time
 		this.breakTimeObject.minutes = Math.max(this.breakTimeObject.minutes + num, 1);
-		const {minutes, seconds} = this.breakTimeObject;
-		const timeDisplay = seconds >= 10 ? minutes + ":" + seconds : minutes + ":0" + seconds;
+		const timeDisplay = this.formatTime(this.breakTimeObject);
 		pubSub.publish("updateBreakTimerLength", timeDisplay);
+		//If its not breaktime, update the breakTimer with the new time immediately
 		if(!this.breakTime) this.breakTimer.reset(this.breakTimeObject);
 	}
 
+
 	reset() {
+		//stop the clock
 		clearInterval(this.interval);
+		//reset the settings
 		this.paused = this.inProgress = false;
-		this.timer.reset(this.timeObject);
+		//reset the timers
+		this.mainTimer.reset(this.timeObject);
 		this.breakTimer.reset(this.breakTimeObject);
-		this.setTimer(this.timer);
+		//set the current timer
+		this.setCurrentTimer(this.mainTimer);
+	}
+
+
+	formatTime({minutes, seconds}) {
+		if(minutes >= 0 && seconds >= 0) {
+			return seconds >= 10 ? minutes + ":" + seconds : minutes + ":0" + seconds;
+		} else {
+			return "0:00";
+		}
 	}
 
 }

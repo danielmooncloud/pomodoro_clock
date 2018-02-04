@@ -4,6 +4,7 @@ export default class Timer {
 	constructor(timeObject) {
 		this.minutes = timeObject.minutes;
 		this.seconds = timeObject.seconds;
+		this.deadline;
 	}
 
 	start() {
